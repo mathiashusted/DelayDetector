@@ -1,0 +1,9 @@
+{
+    "stationId": "8011160",
+    "stationName": "Hbf", 
+    "lines": [],
+    "maxTrains": 20,
+    "duration": 200,
+    "refreshInterval": 5,
+    "outputToTerminal": true
+}
