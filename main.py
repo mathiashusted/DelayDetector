@@ -8,7 +8,7 @@ from math import floor
 date = datetime.datetime.now()
 
 def wait(actual, now):
-    if (actual.replace(tzinfo=None) - now).total_seconds() <= 120:
+    if (actual.replace(tzinfo=None) - now).total_seconds() <= 60:
         return "Now"
     else:
         return str(floor((actual.replace(tzinfo=None)-now).total_seconds()/60)) + "\""
