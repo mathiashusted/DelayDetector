@@ -27,6 +27,9 @@ headers = {
 
 dateFormat = "%Y-%m-%dT%H:%M:%S%z"
 
+def extract_plannedWhen(data):
+    return data.get("plannedWhen")
+
 
 
 while True:
