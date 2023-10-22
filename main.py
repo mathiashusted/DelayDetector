@@ -31,7 +31,7 @@ dateFormat = "%Y-%m-%dT%H:%M:%S%z"
 
 while True:
     date = datetime.datetime.now()
-    conn = http.client.HTTPSConnection("v6.db.transport.rest", timeout=5)
+    conn = http.client.HTTPSConnection("v6.bvg.transport.rest", timeout=5)
     try:
         conn.request("GET", "/stops/" + config["stationId"] + "/departures?duration=" + str(config["duration"]) + "&linesOfStops=false&remarks=true&language=en", headers=headers)
         res = conn.getresponse()
@@ -40,6 +40,10 @@ while True:
     except:
         print("Error retrieving data, trying again...")
         continue
+
+    hasActual = False
+
+    
 
     if config["outputToTerminal"]:
         os.system('clear')
@@ -54,24 +58,31 @@ while True:
                 if elem["when"] != None:
                     actual = datetime.datetime.strptime(elem["when"], dateFormat)
                     delay = int((actual - planned).total_seconds() / 60)
-                    clock = actual.strftime("%H:%M")
+                    hasActual = True
                 if (config["lines"] != []) and  not (elem["line"]["name"] in config["lines"]):
                     continue
-                if elem["remarks"] != []:
-                    print (f"\033[1m{elem['line']['name']:<10}\033[0m {elem['direction']:<45} {planned.strftime('%H:%M'):<10}\033[41m CANCELLED\033[0m")
+                if "remarks" in elem and len(elem["remarks"]) > 1 and "code" in elem["remarks"][1] and elem["remarks"][1]["code"] == "text.realtime.journey.cancelled":
+                    print (f"\033[1m{elem['line']['name']:<10}\033[0m {elem['direction']:<45} {planned.strftime('%H:%M'):<10} \033[41mCANCELLED\033[0m")
                     continue
+
                 print(f"\033[1m{elem['line']['name']:<10}\033[0m {elem['direction']:<45} ", end='')
-                print(f"{clock:<10} ", end='')
-                if (actual):         
+
+                if hasActual:
+                    clock = actual.strftime("%H:%M")   
+                    print(f"{clock:<10} ", end='')   
                     if (delay == 0):
                         print(f"{wait(actual,date):<10} ", end='')
-                        print(" \033[92m(=)\033[0m")
+                        print("\033[92m(=)\033[0m")
                     elif (delay > 0):
                         print(f"\033[31m{wait(actual,date):<10} \033[0m", end='')
-                        print(" \033[41m(+" + str(delay) + ")\033[0m")
+                        print("\033[41m(+" + str(delay) + ")\033[0m")
                     elif (delay < 0):
                         print(f"{wait(actual,date):<10} ", end='')
-                        print(" \033[43m(" + str(delay) + ")\033[0m")
+                        print("\033[43m(" + str(delay) + ")\033[0m")
+                else:
+                    clock = planned.strftime("%H:%M")
+                    print(f"{clock:<10} ", end='')
+                    print(f"{wait(planned,date):<10} N/A")
                 count += 1
             else:
                 break
