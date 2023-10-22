@@ -27,6 +27,9 @@ headers = {
 
 dateFormat = "%Y-%m-%dT%H:%M:%S%z"
 
+def extract_plannedWhen(data):
+    return data.get("plannedWhen")
+
 
 
 while True:
@@ -37,6 +40,7 @@ while True:
         res = conn.getresponse()
         data = res.read()
         parsed = json.loads(data)
+        parsed["departures"] = sorted(parsed["departures"], key=extract_plannedWhen)
     except:
         print("Error retrieving data, trying again...")
         continue
