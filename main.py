@@ -53,6 +53,7 @@ while True:
 
         print(f"\033[95m{'Line':<10} {'Destination':<45} {'Departure':<10} {'Wait':<10} {'Delay':<10}\033[0m")
         for elem in parsed["departures"]:
+            count += 1
             if count < config["maxTrains"]:
                 planned = datetime.datetime.strptime(elem["plannedWhen"], dateFormat)
                 if elem["when"] != None:
@@ -83,7 +84,6 @@ while True:
                     clock = planned.strftime("%H:%M")
                     print(f"{clock:<10} ", end='')
                     print(f"{wait(planned,date):<10} N/A")
-                count += 1
             else:
                 break
 
